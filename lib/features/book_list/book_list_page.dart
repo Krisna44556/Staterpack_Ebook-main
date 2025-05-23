@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../features/auth/domain/book_provider.dart';
-import '../../../models/book_model.dart';
 
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,7 @@ class _BookListPageState extends ConsumerState<BookListPage> {
     super.initState();
     // 👇 Panggil fetch data pertama kali
     Future.microtask(() {
-      ref.read(bookProvider.notifier).fetchByCategory('novel');
+      ref.read(bookProvider.notifier).fetchAllBooks();
     });
   }
 
@@ -46,7 +46,9 @@ class _BookListPageState extends ConsumerState<BookListPage> {
               itemCount: books.length,
               itemBuilder: (context, index) {
                 final book = books[index];
-                print('Book loaded: ${book.title}');
+                if (kDebugMode) {
+                  print('Book loaded: ${book.title}');
+                }
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: ListTile(

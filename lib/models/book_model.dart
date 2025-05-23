@@ -1,4 +1,5 @@
-import '../../../models/book_model.dart';
+
+// ignore_for_file: non_constant_identifier_names
 
 class BookModel {
   final int id;
@@ -9,6 +10,8 @@ class BookModel {
   final String category;
   final String description;
   final String stok;
+  // ignore: duplicate_ignore
+  // ignore: non_constant_identifier_names
   final String borrowed_count;
   final String coverUrl;
   final bool isAvailable;

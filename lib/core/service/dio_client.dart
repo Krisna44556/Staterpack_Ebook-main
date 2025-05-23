@@ -28,11 +28,10 @@
 // }
 
 import 'package:dio/dio.dart';
-import '../utils/storage_helper.dart'; // pastikan import ini bener
 
 class DioClient {
   static final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8000/api',
+    baseUrl: 'http://127.0.0.1:8000/api',
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
     headers: {
@@ -41,14 +40,6 @@ class DioClient {
   ));
 
   static Dio get dio => _dio;
-
-  /// Panggil ini saat awal aplikasi
-  static Future<void> initAuth() async {
-    final token = await StorageHelper.getToken();
-    if (token != null) {
-      _dio.options.headers['Authorization'] = 'Bearer $token';
-    }
-  }
 
   static Future<void> setAuthToken(String token) async {
     _dio.options.headers['Authorization'] = 'Bearer $token';

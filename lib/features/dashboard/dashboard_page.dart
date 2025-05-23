@@ -1,54 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../auth/domain/auth_provider.dart';
+import '../auth/domain/book_provider.dart';
+import '../../models/book_model.dart';
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends ConsumerState<DashboardPage> {
   int _selectedIndex = 0;
 
-  final List<Map<String, String>> books = [
-    {
-      'title': 'Pemrograman Dart',
-      'author': 'Budi Santoso',
-      'image': 'assets/images/img.png'
-    },
-    {
-      'title': 'Belajar Flutter',
-      'author': 'Ani Wijaya',
-      'image': 'https://raw.githubusercontent.com/dicodingacademy/assets/main/flutter_dicoding/flutter.png'
-    },
-    {
-      'title': 'Pemrograman Web',
-      'author': 'Siti Aminah',
-      'image': 'https://cdn-icons-png.flaticon.com/512/2306/2306154.png'
-    },
-    {
-      'title': 'UI/UX Modern',
-      'author': 'Tono Rahman',
-      'image': 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
-    },
-    {
-      'title': 'Database NoSQL',
-      'author': 'Dina Kartika',
-      'image': 'https://cdn-icons-png.flaticon.com/512/2921/2921222.png'
-    },
-    {
-      'title': 'AI & Machine Learning',
-      'author': 'Rizal Hakim',
-      'image': 'https://cdn-icons-png.flaticon.com/512/2857/2857757.png'
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch buku pertama kali saat masuk dashboard
+    Future.microtask(() {
+      ref.read(bookProvider.notifier).fetchAllBooks();
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    // Jika tab buku dipilih, fetch buku dari database
+    if (index == 1) {
+      ref.read(bookProvider.notifier).fetchAllBooks();
+    }
   }
 
   Widget _buildPage() {
@@ -56,7 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
       case 0:
         return _buildHome();
       case 1:
-        return _buildBook();
+        return _buildBookList();
       case 2:
         return _buildBorrowing();
       case 3:
@@ -67,67 +48,40 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildHome() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: books.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.65,
-      ),
-      itemBuilder: (context, index) {
-        final book = books[index];
-        return Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  book['image']!,
-                  height: 140,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, size: 80),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      book['title']!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'by ${book['author']}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    return const Center(
+      child: Text('Selamat datang di Dashboard!', style: TextStyle(fontSize: 20)),
     );
   }
 
-  Widget _buildBook() {
-    return const Center(
-      child: Text('📥 Daftar Buku yang mau di pinjam', style: TextStyle(fontSize: 20)),
+  Widget _buildBookList() {
+    final books = ref.watch(bookProvider);
+
+    if (books.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView.builder(
+      itemCount: books.length,
+      itemBuilder: (context, index) {
+        final BookModel book = books[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: ListTile(
+            leading: book.coverUrl.startsWith('http')
+                ? Image.network(book.coverUrl, width: 50, height: 70, fit: BoxFit.cover)
+                : Image.asset(book.coverUrl, width: 50, height: 70, fit: BoxFit.cover),
+            title: Text(book.title),
+            subtitle: Text('Penulis: ${book.author}'),
+            trailing: Chip(
+              label: Text(
+                book.isAvailable ? 'Tersedia' : 'Dipinjam',
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: book.isAvailable ? Colors.green : Colors.red,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -147,7 +101,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(['Home','buku', 'Peminjaman', 'Riwayat'][_selectedIndex]),
+        title: Text(['Home', 'Buku', 'Peminjaman', 'Riwayat'][_selectedIndex]),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
@@ -160,7 +114,7 @@ class _DashboardPageState extends State<DashboardPage> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'buku'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Buku'),
           BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'Pinjam'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
         ],

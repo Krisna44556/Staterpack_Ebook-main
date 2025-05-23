@@ -1,32 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../models/user_model.dart';
 import '../data/auth_repository.dart';
+import '../../../models/user_model.dart';
 
-final authProvider = StateNotifierProvider<AuthController, UserModel?>((ref) {
-  return AuthController();
+final authProvider = StateNotifierProvider<AuthNotifier, UserModel?>((ref) {
+  return AuthNotifier();
 });
 
-class AuthController extends StateNotifier<UserModel?> {
-  final AuthRepository _repository = AuthRepository();
+class AuthNotifier extends StateNotifier<UserModel?> {
+  final AuthRepository _repo = AuthRepository();
 
-  AuthController() : super(null);
+  AuthNotifier() : super(null);
 
   Future<void> login(String email, String password) async {
-    final result = await _repository.login(email, password);
+    final result = await _repo.login(email, password);
     state = result['user'];
   }
 
   Future<void> register(String name, String email, String password, String passwordConfirmation) async {
-    final result = await _repository.register(name, email, password, passwordConfirmation);
+    final result = await _repo.register(name, email, password, passwordConfirmation);
     state = result['user'];
   }
 
-  Future<void> loadUser() async {
-    state = await _repository.getMe();
-  }
-
-  Future<void> logout() async {
-    await _repository.logout();
+  void logout() {
     state = null;
+    _repo.logout();
   }
 }

@@ -6,8 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 
-
-
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -24,17 +22,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => isLoading = true);
-
-    await ref.read(authProvider.notifier).login(
-          emailController.text.trim(),
-          passwordController.text.trim(),
+  
+    try {
+      await ref.read(authProvider.notifier).login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+    } catch (e) {
+      // Tampilkan error jika ada
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login error: $e')),
         );
+      }
+    }
     setState(() => isLoading = false);
-
+  
     final user = ref.read(authProvider);
     if (user != null && mounted) {
       Navigator.pushReplacementNamed(context, '/dashboard');
     } else {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Login gagal. Periksa kembali email dan password.")),
       );

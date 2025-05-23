@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Pastikan path berikut sesuai dengan struktur folder kamu!
 import 'features/auth/presentation/login_page.dart';
-import 'features/dashboard/dashboard_page.dart'; // pastikan path ini benar
+import 'features/dashboard/dashboard_page.dart';
 import 'features/auth/domain/auth_provider.dart';
-import 'features/loan/loan_history_page.dart';
-import 'features/book_list/book_list_page.dart';
-import 'models/user_model.dart';
-import 'models/book_model.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));

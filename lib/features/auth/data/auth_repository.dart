@@ -1,22 +1,36 @@
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_endpoints.dart';
-import 'package:sungokong_book/core/service/dio_client.dart';
+import '../../../core/service/dio_client.dart';
 import '../../../core/utils/storage_helper.dart';
 import '../../../models/user_model.dart';
 
 class AuthRepository {
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await DioClient.dio.post(ApiEndpoints.login, data: {
-      'email': email,
-      'password': password,
-    });
-  
-    final token = response.data['data']['token'];
-    final user = UserModel.fromJson(response.data['data']['user']);
-    await StorageHelper.saveToken(token);
-    await DioClient.setAuthToken(token);
+  final Dio _dio = DioClient.dio;
 
-    return {'user': user, 'token': token};
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    try {
+      final response = await _dio.post(ApiEndpoints.login, data: {
+        'email': email,
+        'password': password,
+      });
+      final data = response.data;
+
+      // Cek apakah data user dan token ada
+      if (data == null || data['user'] == null || data['token'] == null) {
+        throw 'Login gagal: Data user atau token tidak ditemukan di respons API.';
+      }
+
+      await StorageHelper.saveToken(data['token']);
+      await DioClient.setAuthToken(data['token']);
+
+      return {
+        'user': UserModel.fromJson(data['user']),
+        'token': data['token'],
+      };
+    } on DioException catch (e) {
+      // Ambil pesan error dari backend jika ada
+      throw e.response?.data['message'] ?? 'Login gagal';
+    }
   }
 
   Future<Map<String, dynamic>> register(String name, String email, String password, String passwordConfirmation) async {
