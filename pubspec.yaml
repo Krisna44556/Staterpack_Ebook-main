@@ -1,0 +1,63 @@
+name: sungokong_book
+description: A digital library app for Sungokong using Flutter and Laravel API with token-based authentication.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  font_awesome_flutter: ^10.7.0
+  google_fonts: ^6.1.0
+  animate_do: ^3.0.2
+
+  # UI
+  cupertino_icons: ^1.0.6
+  flutter_spinkit: ^5.2.0
+  gap: ^3.0.1
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # HTTP Client
+  dio: ^5.4.1
+
+  # Local Storage
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.2
+
+  # Routing
+  go_router: ^13.2.1
+
+  # JSON Serialization
+  json_annotation: ^4.8.1
+
+  # Functional Programming (Optional, untuk Either, Option, Unit, dll)
+  dartz: ^0.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+  # Code Generation
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
