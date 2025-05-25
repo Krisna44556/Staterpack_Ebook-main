@@ -1,20 +1,16 @@
-
-// ignore_for_file: non_constant_identifier_names
-
 class BookModel {
   final int id;
   final String title;
   final String author;
-  final String publisher;
-  final String year;
+  final String? publisher;
+  final int? publishedYear;
   final String category;
-  final String description;
-  final String stok;
-  // ignore: duplicate_ignore
-  // ignore: non_constant_identifier_names
-  final String borrowed_count;
-  final String coverUrl;
+  final String? description;
+  final int stock;
+  final int borrowedCount;
+  final String? coverUrl;
   final bool isAvailable;
+  final int quantity;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -22,33 +18,39 @@ class BookModel {
     required this.id,
     required this.title,
     required this.author,
-    required this.publisher,
-    required this.year,
+    this.publisher,
+    this.publishedYear,
     required this.category,
-    required this.description,
-    required this.stok,
-    required this.borrowed_count,
-    required this.coverUrl,
+    this.description,
+    required this.stock,
+    required this.borrowedCount,
+    this.coverUrl,
     required this.isAvailable,
+    required this.quantity,
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     return BookModel(
-      id: json['id'],
-      title: json['title'],
-      author: json['author'],
-      publisher: json['publisher'],
-      year: json['year'],
-      category: json['category'],
-      description: json['description'],
-      stok: json['stok'],
-      borrowed_count: json['borrowed_count'],
-      coverUrl: json['cover_url'],
-      isAvailable: json['is_available'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: json['id'] as int? ?? 0,
+      title: json['title'] as String? ?? 'No Title',
+      author: json['author'] as String? ?? 'Unknown Author',
+      publisher: json['publisher'] as String?,
+      publishedYear: json['published_year'] as int?,
+      category: json['category'] as String? ?? 'Uncategorized',
+      description: json['description'] as String?,
+      stock: json['stock'] as int? ?? 0,
+      borrowedCount: json['borrowed_count'] as int? ?? 0,
+      coverUrl: json['cover_url'] as String?,
+      isAvailable: (json['is_available'] as int?) == 1, // Convert 1/0 to bool
+      quantity: json['quantity'] as int? ?? 1,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
     );
   }
 
@@ -58,13 +60,14 @@ class BookModel {
       'title': title,
       'author': author,
       'publisher': publisher,
-      'year': year,
+      'published_year': publishedYear,
       'category': category,
       'description': description,
-      'stok': stok,
-      'borrowed_count': borrowed_count,
+      'stock': stock,
+      'borrowed_count': borrowedCount,
       'cover_url': coverUrl,
-      'is_available': isAvailable,
+      'is_available': isAvailable ? 1 : 0, // Convert back to int
+      'quantity': quantity,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
