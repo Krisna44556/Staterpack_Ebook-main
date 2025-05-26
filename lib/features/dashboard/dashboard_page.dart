@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/domain/book_provider.dart';
+import 'dart:async';
+
+
 
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
@@ -17,7 +20,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ['Home', 'Buku', 'Peminjaman', 'Riwayat'][_selectedIndex],
+          ['Home', 'Buku', 'Peminjaman', 'Riwayat', 'Profil'][_selectedIndex],
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -43,11 +46,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Buku'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_books),
-            label: 'Pinjam',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.library_books),label: 'Pinjam'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );
@@ -63,26 +64,115 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         return _buildBorrowing();
       case 3:
         return _buildHistory();
+      case 4:
+        return _buildProfil();
       default:
         return const Center(child: Text('Halaman tidak ditemukan'));
     }
   }
 
+  // halaman home
+
   Widget _buildHome() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.home, size: 60, color: Colors.teal),
-          SizedBox(height: 20),
-          Text(
-            'Selamat datang di Dashboard!',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  final PageController _pageController = PageController(viewportFraction: 0.85);
+  int _currentPage = 0;
+
+  // Timer auto scroll
+  Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+    if (_pageController.hasClients) {
+      _currentPage++;
+      if (_currentPage >= 3) {
+        _currentPage = 0;
+      }
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  });
+
+  final List<Map<String, dynamic>> _carouselItems = [
+    {
+      'icon': Icons.explore,
+      'title': 'Eksplor Buku',
+      'desc': 'Jelajahi Buku Terbaru Yang Kamu Mau',
+    },
+    {
+      'icon': Icons.event,
+      'title': 'Author',
+      'desc': 'Cek jadwal Author Yang Terkenal',
+    },
+    {
+      'icon': Icons.star,
+      'title': 'Info Buku Hits',
+      'desc': 'Lihat Buku Yang Paling Hits',
+    },
+  ];
+
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        const SizedBox(height: 30),
+        const Icon(Icons.home, size: 60, color: Colors.teal),
+        const SizedBox(height: 20),
+        const Text(
+          'Selamat datang di Dashboard!',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Temukan fitur menarik di sini',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+        const SizedBox(height: 30),
+
+        // Carousel
+        SizedBox(
+          height: 220,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _carouselItems.length,
+            itemBuilder: (context, index) {
+              final item = _carouselItems[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 5,
+                  color: Colors.teal.shade50,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(item['icon'], size: 50, color: Colors.teal),
+                        const SizedBox(height: 10),
+                        Text(item['title'],
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal)),
+                        const SizedBox(height: 5),
+                        Text(item['desc'],
+                            style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
-    );
-  }
+        ),
+
+        const SizedBox(height: 30),
+      ],
+    ),
+  );
+}
+
+
+
 
   Widget _buildBookList() {
     final booksState = ref.watch(bookProvider);
@@ -230,9 +320,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   );
                 },
               ),
-      ),
-    );
-  }
+            ),
+          );
+        }
 
   Widget _buildBorrowing() {
     return const Center(
@@ -259,6 +349,22 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           SizedBox(height: 20),
           Text(
             'Riwayat Peminjaman',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfil() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.person, size: 60, color: Colors.teal),
+          SizedBox(height: 20),
+          Text(
+            'Halaman Profil',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ],
