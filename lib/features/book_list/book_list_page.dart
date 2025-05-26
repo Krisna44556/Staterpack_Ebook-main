@@ -46,7 +46,7 @@ class BookListPage extends ConsumerWidget {
                   onPressed: () => controller.fetchAllBooks(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 12,
