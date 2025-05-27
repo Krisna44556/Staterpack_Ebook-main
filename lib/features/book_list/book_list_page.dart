@@ -20,7 +20,7 @@ class BookListPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => controller.fetchAllBooks(),
-            tooltip: 'Refreshh Daftar Buku',
+            tooltip: 'Refresh',
           ),
         ],
       ),
