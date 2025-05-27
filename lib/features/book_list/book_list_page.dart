@@ -88,7 +88,65 @@ class BookListPage extends ConsumerWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          // Navigasi ke detail buku di sini
+                          // Tampilkan pop-up dialog detail buku
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              title: Text(book.title),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (book.coverUrl != null &&
+                                        book.coverUrl!.startsWith('http'))
+                                      Image.network(
+                                        book.coverUrl!,
+                                        height: 150,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(Icons.broken_image,
+                                                    size: 40),
+                                      )
+                                    else
+                                      Image.asset(
+                                        book.coverUrl ??
+                                            'assets/placeholder_book.png',
+                                        height: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    const SizedBox(height: 12),
+                                    Text('Penulis: ${book.author}'),
+                                    if (book.publisher != null)
+                                      Text('Penerbit: ${book.publisher}'),
+                                    if (book.publishedYear != null)
+                                      Text('Tahun Terbit: ${book.publishedYear}'),
+                                    Text('Kategori: ${book.category}'),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      book.description ??
+                                          'Tidak ada deskripsi tersedia.',
+                                      style: const TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text('Stok Tersedia: ${book.stock}'),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Tutup'),
+                                ),
+                              ],
+                            ),
+                          );
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
