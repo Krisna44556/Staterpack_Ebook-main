@@ -9,12 +9,13 @@ class BookService {
   BookService({required Dio dio}) : _dio = dio;
 
   // Helper method to add auth header
-  Future<void> _addAuthorizationHeader() async {
-    final token = await StorageHelper.getToken();
-    if (token != null) {
-      _dio.options.headers['Authorization'] = 'Bearer $token';
-    }
+ Future<void> _addAuthorizationHeader() async {
+  final token = await StorageHelper.getToken(); // Ambil token, bukan save
+  if (token != null) {
+    _dio.options.headers['Authorization'] = 'Bearer $token';
   }
+}
+
 
   Future<List<BookModel>> fetchAllBooks() async {
     try {
@@ -35,15 +36,17 @@ class BookService {
   }
 
   // 🏷️ Get books by category (protected)
-  Future<List<BookModel>> fetchByCategory(String category) async {
-    try {
-      final response = await _dio.get('/books/category/$category');
-      final List data = response.data['data'] ?? [];
-      return data.map((e) => BookModel.fromJson(e)).toList();
-    } on DioException catch (e) {
-      throw e.response?.data['message'] ?? 'Failed to fetch books by category';
-    }
+ Future<List<BookModel>> fetchByCategory(String category) async {
+  await _addAuthorizationHeader(); // Tambahkan ini!
+  try {
+    final response = await _dio.get('/books/category/$category');
+    final List data = response.data['data'] ?? [];
+    return data.map((e) => BookModel.fromJson(e)).toList();
+  } on DioException catch (e) {
+    throw e.response?.data['message'] ?? 'Failed to fetch books by category';
   }
+}
+
 
   // 📖 Get book details (protected)
   Future<BookModel> fetchBookDetail(int id) async {

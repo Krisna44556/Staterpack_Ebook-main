@@ -13,20 +13,21 @@ class AuthRepository {
         'email': email,
         'password': password,
       });
-      final data = response.data;
 
-      // Cek apakah data user dan token ada
-      if (data == null || data['user'] == null || data['token'] == null) {
-        throw 'Login gagal: Data user atau token tidak ditemukan di respons API.';
-      }
+final data = response.data['data']; // ambil dari key 'data'
 
-      await StorageHelper.saveToken(data['token']);
-      await DioClient.setAuthToken(data['token']);
+if (data == null || data['user'] == null || data['token'] == null) {
+  throw 'Login gagal: Data user atau token tidak ditemukan di respons API.';
+}
 
-      return {
-        'user': UserModel.fromJson(data['user']),
-        'token': data['token'],
-      };
+await StorageHelper.saveToken(data['token']);
+await DioClient.setAuthToken(data['token']);
+
+return {
+  'user': UserModel.fromJson(data['user']),
+  'token': data['token'],
+};
+
     } on DioException catch (e) {
       // Ambil pesan error dari backend jika ada
       throw e.response?.data['message'] ?? 'Login gagal';
