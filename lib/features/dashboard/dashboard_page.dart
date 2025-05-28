@@ -245,10 +245,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(12),
                             ),
-                            child: (book.coverUrl != null &&
-                                    book.coverUrl!.startsWith('http'))
+                            child: (book.imageUrl!= null &&
+                                    book.imageUrl!.startsWith('http'))
                                 ? Image.network(
-                                    book.coverUrl!,
+                                    book.imageUrl!,
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
@@ -256,7 +256,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                                                 size: 50),
                                   )
                                 : Image.asset(
-                                    book.coverUrl ??
+                                    book.imageUrl
+ ??
                                         'assets/placeholder_book.png',
                                     fit: BoxFit.cover,
                                     errorBuilder:
@@ -323,6 +324,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             ),
           );
         }
+
+
 
   Widget _buildBorrowing() {
     return const Center(

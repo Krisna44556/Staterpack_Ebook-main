@@ -1,16 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+
 import '../../../../models/book_model.dart';
 import '../data/book_service.dart';
-import '../../../core/utils/storage_helper.dart';
 import '../../../core/service/dio_client.dart';
 
 final bookServiceProvider = Provider<BookService>((ref) {
   return BookService(dio: DioClient.dio);
 });
 
-final bookProvider =
-    StateNotifierProvider<BookController, AsyncValue<List<BookModel>>>((ref) {
+final bookProvider = StateNotifierProvider<BookController, AsyncValue<List<BookModel>>>((ref) {
   final service = ref.read(bookServiceProvider);
   return BookController(service);
 });

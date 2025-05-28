@@ -4,13 +4,11 @@ class BookModel {
   final String author;
   final String? publisher;
   final int? publishedYear;
-  final String category;
   final String? description;
-  final int stock;
-  final int borrowedCount;
-  final String? coverUrl;
-  final bool isAvailable;
   final int quantity;
+  final int borrowedCount;
+  final String? imageUrl;
+  final String? category;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -20,16 +18,17 @@ class BookModel {
     required this.author,
     this.publisher,
     this.publishedYear,
-    required this.category,
     this.description,
-    required this.stock,
-    required this.borrowedCount,
-    this.coverUrl,
-    required this.isAvailable,
     required this.quantity,
+    required this.borrowedCount,
+    this.imageUrl,
+    this.category,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  /// Getter tambahan sesuai kebutuhan frontend
+  bool get isAvailable => quantity > borrowedCount;
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     return BookModel(
@@ -38,18 +37,16 @@ class BookModel {
       author: json['author'] as String? ?? 'Unknown Author',
       publisher: json['publisher'] as String?,
       publishedYear: json['published_year'] as int?,
-      category: json['category'] as String? ?? 'Uncategorized',
       description: json['description'] as String?,
-      stock: json['stock'] as int? ?? 0,
+      quantity: json['quantity'] as int? ?? 0,
       borrowedCount: json['borrowed_count'] as int? ?? 0,
-      coverUrl: json['cover_url'] as String?,
-      isAvailable: (json['is_available'] as int?) == 1, // Convert 1/0 to bool
-      quantity: json['quantity'] as int? ?? 1,
+      imageUrl: json['image_url'] as String?,
+      category: json['category'] as String?,
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
+          ? DateTime.parse(json['created_at'])
           : DateTime.now(),
       updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
+          ? DateTime.parse(json['updated_at'])
           : DateTime.now(),
     );
   }
@@ -61,13 +58,11 @@ class BookModel {
       'author': author,
       'publisher': publisher,
       'published_year': publishedYear,
-      'category': category,
       'description': description,
-      'stock': stock,
-      'borrowed_count': borrowedCount,
-      'cover_url': coverUrl,
-      'is_available': isAvailable ? 1 : 0, // Convert back to int
       'quantity': quantity,
+      'borrowed_count': borrowedCount,
+      'image_url': imageUrl,
+      'category': category,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
