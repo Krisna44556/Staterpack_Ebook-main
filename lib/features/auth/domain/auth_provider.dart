@@ -1,54 +1,74 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/auth_repository.dart';
 import '../../../models/user_model.dart';
-import 'dart:convert'; // untuk jsonEncode & jsonDecode
-import 'package:http/http.dart' as http; // untuk http.post, http.get, dll
+import '../data/auth_repository.dart';
 
-
-final authProvider = StateNotifierProvider<AuthNotifier, Map<String, dynamic>?>(
+final authProvider = StateNotifierProvider<AuthNotifier, UserModel?>(
   (ref) => AuthNotifier(),
 );
 
-class AuthNotifier extends StateNotifier<Map<String, dynamic>?> {
-  AuthNotifier() : super(null);
+class AuthNotifier extends StateNotifier<UserModel?> {
+  final AuthRepository _authRepository = AuthRepository();
 
-  final String baseUrl = 'http://127.0.0.1:8000/api'; // Ganti IP sesuai emulator/device
+  AuthNotifier() : super(null) {
+    _loadUser();
+  }
 
-  Future<void> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      state = data['data'];
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error['message'] ?? 'Login gagal');
+  /// Memuat user saat inisialisasi
+  Future<void> _loadUser() async {
+    try {
+      final user = await _authRepository.getMe();
+      state = user;
+    } catch (_) {
+      state = null;
     }
   }
 
-  Future<void> register(String name, String email, String password, String confirmPassword) async {
-  final response = await http.post(
-    Uri.parse('$baseUrl/register'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'name': name,
-      'email': email,
-      'password': password,
-      'password_confirmation': confirmPassword,
-    }),
-  );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        state = data['data'];
-      } else {
-        final error = jsonDecode(response.body);
-        throw Exception(error['message'] ?? 'Pendaftaran gagal');
+  /// Login dengan email & password
+  /// Return true jika berhasil, false jika gagal
+  Future<bool> login(String email, String password) async {
+    try {
+      final result = await _authRepository.login(email, password);
+      if (result.containsKey('user') && result['user'] != null) {
+        state = result['user'] as UserModel;
+        return true;
       }
+      return false;
+    } catch (_) {
+      return false;
     }
+  }
 
+  /// Register dengan nama, email, password dan konfirmasi password
+  /// Return true jika berhasil, false jika gagal
+  Future<bool> register(
+    String name,
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
+    try {
+      final result = await _authRepository.register(
+        name,
+        email,
+        password,
+        confirmPassword,
+      );
+      if (result.containsKey('user') && result['user'] != null) {
+        state = result['user'] as UserModel;
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Logout user
+  Future<void> logout() async {
+    try {
+      await _authRepository.logout();
+    } finally {
+      state = null;
+    }
+  }
 }
