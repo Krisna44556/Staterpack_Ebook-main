@@ -1,18 +1,23 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageHelper {
+  static const String _tokenKey = 'auth_token';
+
+  /// Simpan token setelah login/register sukses
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
+    await prefs.setString(_tokenKey, token);
   }
 
+  /// Ambil token saat butuh autentikasi
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    return prefs.getString(_tokenKey);
   }
 
-  static Future<void> clearToken() async {
+  /// Hapus token saat logout
+  static Future<void> deleteToken() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-  }
+    await prefs.remove(_tokenKey);
+    }
 }
