@@ -14,38 +14,34 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() => isLoading = true);
-  
+
     try {
       await ref.read(authProvider.notifier).login(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
+
+      final user = ref.read(authProvider);
+      if (user != null && mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
     } catch (e) {
-      // Tampilkan error jika ada
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login error: $e')),
+          SnackBar(content: Text('Login gagal: ${e.toString()}')),
         );
       }
-    }
-    setState(() => isLoading = false);
-  
-    final user = ref.read(authProvider);
-    if (user != null && mounted) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    } else {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login gagal. Periksa kembali email dan password.")),
-      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -90,9 +86,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       // Email Field
                       TextFormField(
                         controller: emailController,
-                        style: const TextStyle(color: Colors.black),
-                        validator: (value) => value!.isEmpty ? 'Email wajib diisi' : null,
-                        decoration: _inputDecoration('Email', FontAwesomeIcons.envelope),
+                        keyboardType: TextInputType.emailAddress,
+                        decoration:
+                            _inputDecoration('Email', FontAwesomeIcons.envelope),
+                        validator: (value) =>
+                            value == null || value.isEmpty ? 'Email wajib diisi' : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -100,13 +98,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       TextFormField(
                         controller: passwordController,
                         obscureText: true,
-                        style: const TextStyle(color: Colors.black),
-                        validator: (value) => value!.isEmpty ? 'Password wajib diisi' : null,
-                        decoration: _inputDecoration('Password', FontAwesomeIcons.lock),
+                        decoration:
+                            _inputDecoration('Password', FontAwesomeIcons.lock),
+                        validator: (value) =>
+                            value == null || value.isEmpty ? 'Password wajib diisi' : null,
                       ),
                       const SizedBox(height: 24),
 
-                      // Button Login
+                      // Login Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -126,18 +125,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             backgroundColor: Colors.brown[800],
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Register link
+                      // Register Link
                       TextButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const RegisterPage()),
-                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RegisterPage(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           'Belum punya akun? Daftar di sini',
                           style: TextStyle(color: Colors.brown),
