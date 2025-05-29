@@ -7,6 +7,7 @@ import '../../../models/user_model.dart';
 class AuthRepository {
   final Dio _dio = DioClient.dio;
 
+  /// Login user dan simpan token
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await _dio.post(ApiEndpoints.login, data: {
@@ -14,52 +15,86 @@ class AuthRepository {
         'password': password,
       });
 
-final data = response.data['data']; // ambil dari key 'data'
+      final data = response.data['data'];
 
-if (data == null || data['user'] == null || data['token'] == null) {
-  throw 'Login gagal: Data user atau token tidak ditemukan di respons API.';
-}
+      if (data == null || data['user'] == null || data['token'] == null) {
+        throw 'Login gagal: data user/token tidak ditemukan di response.';
+      }
 
-await StorageHelper.saveToken(data['token']);
-await DioClient.setAuthToken(data['token']);
+      final token = data['token'];
+      final user = UserModel.fromJson(data['user']);
 
-return {
-  'user': UserModel.fromJson(data['user']),
-  'token': data['token'],
-};
+      await StorageHelper.saveToken(token);
+      await DioClient.setAuthToken(token);
 
+      return {'user': user, 'token': token};
     } on DioException catch (e) {
-      // Ambil pesan error dari backend jika ada
-      throw e.response?.data['message'] ?? 'Login gagal';
+      final message = e.response?.data['message'] ?? 'Login gagal';
+      throw message;
     }
   }
 
-  Future<Map<String, dynamic>> register(String name, String email, String password, String passwordConfirmation) async {
-    final response = await DioClient.dio.post(ApiEndpoints.register, data: {
-      'name': name,
-      'email': email,
-      'password': password,
-      'password_confirmation': passwordConfirmation,
-    });
+  /// Register user baru
+  Future<Map<String, dynamic>> register(
+    String name,
+    String email,
+    String password,
+    String passwordConfirmation,
+  ) async {
+    try {
+      final response = await _dio.post(ApiEndpoints.register, data: {
+        'name': name,
+        'email': email,
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      });
 
-    final token = response.data['data']['token'];
-    final user = UserModel.fromJson(response.data['data']['user']);
-    await StorageHelper.saveToken(token);
-    await DioClient.setAuthToken(token);
+      final data = response.data['data'];
 
-    return {'user': user, 'token': token};
+      if (data == null || data['user'] == null || data['token'] == null) {
+        throw 'Register gagal: data user/token tidak ditemukan di response.';
+      }
+
+      final token = data['token'];
+      final user = UserModel.fromJson(data['user']);
+
+      await StorageHelper.saveToken(token);
+      await DioClient.setAuthToken(token);
+
+      return {'user': user, 'token': token};
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Register gagal';
+      throw message;
+    }
   }
 
+  /// Ambil data user dari endpoint /api/me
   Future<UserModel> getMe() async {
     final token = await StorageHelper.getToken();
-    if (token != null) await DioClient.setAuthToken(token);
 
-    final response = await DioClient.dio.get(ApiEndpoints.me);
-    return UserModel.fromJson(response.data['data']);
+    if (token == null) throw 'Token tidak ditemukan. Silakan login ulang.';
+
+    await DioClient.setAuthToken(token);
+
+    try {
+      final response = await _dio.get(ApiEndpoints.me);
+      final userData = response.data['data'];
+      return UserModel.fromJson(userData);
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Gagal mengambil data user';
+      throw message;
+    }
   }
 
+  /// Logout user
   Future<void> logout() async {
-    await StorageHelper.clearToken();
+    try {
+      await _dio.post(ApiEndpoints.logout);
+    } catch (_) {
+      // Biarkan jika gagal, kita tetap lanjut hapus token
+    }
+
+    await StorageHelper.deleteToken();
     await DioClient.clearAuthToken();
-  }
+    }
 }
