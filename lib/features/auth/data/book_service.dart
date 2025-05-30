@@ -9,23 +9,26 @@ class BookService {
   BookService({required Dio dio}) : _dio = dio;
 
   // Helper method to add auth header
- Future<void> _addAuthorizationHeader() async {
-  final token = await StorageHelper.getToken(); // Ambil token, bukan save
+Future<void> _addAuthorizationHeader() async {
+  final token = await StorageHelper.getToken();
+  print('Token yang diambil: $token'); // 👈 Tambahkan ini
   if (token != null) {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 }
 
 
-  Future<List<BookModel>> fetchAllBooks() async {
-    try {
-      final response = await _dio.get('/public-books');
-      final List data = response.data['data'] ?? [];
-      return data.map((e) => BookModel.fromJson(e)).toList();
-    } on DioException catch (e) {
-      throw e.response?.data['message'] ?? 'Failed to fetch books';
-    }
-  }
+
+
+ Future<List<BookModel>> fetchAllBooks() async {
+  await _addAuthorizationHeader(); // Jika endpoint butuh autentikasi
+  final response = await _dio.get('/books');
+  final List data = response.data['data'] ?? [];
+  return data.map((e) => BookModel.fromJson(e)).toList();
+}
+
+
+
 
   // 🔥 Get top 10 popular books (protected)
   Future<List<BookModel>> fetchTopBooks() async {
