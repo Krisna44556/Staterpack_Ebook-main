@@ -13,7 +13,6 @@ class AuthNotifier extends StateNotifier<UserModel?> {
     _loadUser();
   }
 
-  /// Memuat user saat inisialisasi
   Future<void> _loadUser() async {
     try {
       final user = await _authRepository.getMe();
@@ -40,19 +39,9 @@ class AuthNotifier extends StateNotifier<UserModel?> {
 
   /// Register dengan nama, email, password dan konfirmasi password
   /// Return true jika berhasil, false jika gagal
-  Future<bool> register(
-    String name,
-    String email,
-    String password,
-    String confirmPassword,
-  ) async {
+  Future<bool> register(String name, String email, String password, String confirmPassword) async {
     try {
-      final result = await _authRepository.register(
-        name,
-        email,
-        password,
-        confirmPassword,
-      );
+      final result = await _authRepository.register(name, email, password, confirmPassword);
       if (result.containsKey('user') && result['user'] != null) {
         state = result['user'] as UserModel;
         return true;
@@ -63,7 +52,6 @@ class AuthNotifier extends StateNotifier<UserModel?> {
     }
   }
 
-  /// Logout user
   Future<void> logout() async {
     try {
       await _authRepository.logout();

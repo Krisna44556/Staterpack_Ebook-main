@@ -23,7 +23,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
-
     try {
       await ref.read(authProvider.notifier).login(
         emailController.text.trim(),
@@ -87,8 +86,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration:
-                            _inputDecoration('Email', FontAwesomeIcons.envelope),
+                        decoration: _inputDecoration('Email', FontAwesomeIcons.envelope),
                         validator: (value) =>
                             value == null || value.isEmpty ? 'Email wajib diisi' : null,
                       ),
@@ -98,8 +96,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       TextFormField(
                         controller: passwordController,
                         obscureText: true,
-                        decoration:
-                            _inputDecoration('Password', FontAwesomeIcons.lock),
+                        decoration: _inputDecoration('Password', FontAwesomeIcons.lock),
                         validator: (value) =>
                             value == null || value.isEmpty ? 'Password wajib diisi' : null,
                       ),
@@ -138,9 +135,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterPage(),
-                            ),
+                            MaterialPageRoute(builder: (_) => const RegisterPage()),
                           );
                         },
                         child: const Text(

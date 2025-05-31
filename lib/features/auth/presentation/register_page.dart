@@ -18,6 +18,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
@@ -33,6 +34,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (passwordController.text != confirmController.text) {
+      _showError('Password dan konfirmasi tidak cocok');
+      return;
+    }
 
     setState(() => isLoading = true);
 
@@ -64,10 +70,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
@@ -82,17 +85,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             constraints: const BoxConstraints(maxWidth: 400),
             child: Form(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ZoomIn(
                     duration: const Duration(milliseconds: 600),
-                    child: Icon(
-                      FontAwesomeIcons.userPlus,
-                      size: 72,
-                      color: Colors.brown[800],
-                    ),
+                    child: Icon(FontAwesomeIcons.userPlus, size: 72, color: Colors.brown[800]),
                   ),
                   const SizedBox(height: 12),
                   FadeInDown(
@@ -108,57 +106,30 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Field Nama Lengkap
-                  _buildTextField(
-                    controller: nameController,
-                    label: 'Nama Lengkap',
-                    icon: FontAwesomeIcons.user,
-                  ),
+                  _buildTextField(nameController, 'Nama Lengkap', FontAwesomeIcons.user),
                   const SizedBox(height: 16),
 
-                  // Field Email
-                  _buildTextField(
-                    controller: emailController,
-                    label: 'Email',
-                    icon: FontAwesomeIcons.envelope,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Email wajib diisi';
-                      final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-                      if (!emailRegex.hasMatch(value)) return 'Format email tidak valid';
-                      return null;
-                    },
-                  ),
+                  _buildTextField(emailController, 'Email', FontAwesomeIcons.envelope, validator: (value) {
+                    if (value == null || value.isEmpty) return 'Email wajib diisi';
+                    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                    if (!emailRegex.hasMatch(value)) return 'Format email tidak valid';
+                    return null;
+                  }),
                   const SizedBox(height: 16),
 
-                  // Field Password
-                  _buildTextField(
-                    controller: passwordController,
-                    label: 'Password',
-                    icon: FontAwesomeIcons.lock,
-                    obscure: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Password wajib diisi';
-                      if (value.length < 6) return 'Password minimal 6 karakter';
-                      return null;
-                    },
-                  ),
+                  _buildTextField(passwordController, 'Password', FontAwesomeIcons.lock, obscure: true, validator: (value) {
+                    if (value == null || value.isEmpty) return 'Password wajib diisi';
+                    if (value.length < 6) return 'Password minimal 6 karakter';
+                    return null;
+                  }),
                   const SizedBox(height: 16),
 
-                  // Field Konfirmasi Password
-                  _buildTextField(
-                    controller: confirmController,
-                    label: 'Konfirmasi Password',
-                    icon: FontAwesomeIcons.lock,
-                    obscure: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Konfirmasi password wajib diisi';
-                      if (value != passwordController.text) return 'Password tidak cocok';
-                      return null;
-                    },
-                  ),
+                  _buildTextField(confirmController, 'Konfirmasi Password', FontAwesomeIcons.lock, obscure: true, validator: (value) {
+                    if (value == null || value.isEmpty) return 'Konfirmasi password wajib diisi';
+                    return null;
+                  }),
                   const SizedBox(height: 24),
 
-                  // Tombol Daftar
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -167,10 +138,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ? const SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.verified_user),
                       label: Text(isLoading ? 'Mendaftar...' : 'DAFTAR SEKARANG'),
@@ -178,26 +146,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Colors.brown[800],
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Tombol kembali ke login
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                      );
-                    },
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    ),
                     child: const Text(
                       '← Kembali ke Login',
                       style: TextStyle(color: Colors.brown),
@@ -212,10 +172,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
     bool obscure = false,
     String? Function(String?)? validator,
   }) {
@@ -234,9 +194,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         labelStyle: const TextStyle(color: Colors.black),
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.black12),

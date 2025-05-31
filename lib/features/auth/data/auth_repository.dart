@@ -96,5 +96,5 @@ class AuthRepository {
 
     await StorageHelper.deleteToken();
     await DioClient.clearAuthToken();
-    }
+  }
 }

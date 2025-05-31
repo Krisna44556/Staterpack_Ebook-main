@@ -19,7 +19,9 @@ class Loan {
       bookId: json['book_id'],
       status: json['status'],
       borrowedAt: DateTime.parse(json['borrowed_at']),
-      returnedAt: json['returned_at'] != null ? DateTime.tryParse(json['returned_at']) : null,
+      returnedAt: json['returned_at'] != null
+          ? DateTime.tryParse(json['returned_at'])
+          : null,
     );
   }
 }

@@ -1,0 +1,80 @@
+lib/
+├── core/
+│   ├── constants/
+│   │   └── api_endpoints.dart       # semua endpoint yang digunakan
+│   ├── service/
+│   │   └── dio_client.dart          # konfigurasi Dio instance
+│   ├── utils/
+│   │   └── storage_helper.dart      # helper untuk SharedPreferences/token
+
+├── models/
+│   ├── user_model.dart
+│   ├── book_model.dart
+│   ├── review_model.dart
+│   ├── loan_model.dart
+│   └── category_model.dart
+
+├── features/
+│   ├── auth/
+│   │   ├── data/
+│   │   │   └── auth_repository.dart
+│   │   ├── domain/
+│   │   │   └── auth_provider.dart
+│   │   └── presentation/
+│   │       ├── login_page.dart
+│   │       ├── register_page.dart
+│   │      
+│   ├── books/
+│   │   ├── data/
+│   │   │   └── book_repository.dart
+│   │   ├── domain/
+│   │   │   └── book_provider.dart
+│   │   └── presentation/
+│   │       ├── book_list_page.dart
+│   │       ├── book_detail_page.dart
+│   │       └── widgets/
+│   │           └── book_card.dart
+
+│   ├── profile/
+│   │   ├── data/
+│   │   │   └── profile_repository.dart
+│   │   ├── domain/
+│   │   │   └── profile_provider.dart
+│   │   └── presentation/
+│   │       └── profile_page.dart
+
+│   ├── loans/
+│   │   ├── data/
+│   │   │   └── loan_repository.dart
+│   │   ├── domain/
+│   │   │   └── loan_provider.dart
+│   │   └── presentation/
+│   │       ├── loan_form_page.dart
+│   │       └── loan_history_page.dart
+
+│   ├── reviews/
+│   │   ├── data/
+│   │   │   └── review_repository.dart
+│   │   ├── domain/
+│   │   │   └── review_provider.dart
+│   │   └── presentation/
+│   │       └── review_section.dart
+
+│   ├── categories/
+│   │   ├── data/
+│   │   │   └── category_repository.dart
+│   │   ├── domain/
+│   │   │   └── category_provider.dart
+│   │   └── presentation/
+│   │       └── category_filter_widget.dart
+
+│   ├── dashboard/
+│   │   ├── presentation/
+│   │   │   └── dashboard_page.dart
+│   │   ├── widgets/
+│   │   │   └── bottom_navbar.dart
+│   │  
+│   │       
+
+
+├── main.dart

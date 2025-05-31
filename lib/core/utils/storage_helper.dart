@@ -19,5 +19,5 @@ class StorageHelper {
   static Future<void> deleteToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
-    }
+  }
 }
